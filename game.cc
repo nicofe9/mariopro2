@@ -3,6 +3,7 @@ using namespace pro2;
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
+     moneda_({100, 150}),
       platforms_{
           Platform(100, 300, 200, 211),
           Platform(0, 200, 250, 261),
@@ -61,4 +62,5 @@ void Game::paint(pro2::Window& window) {
         p.paint(window);
     }
     mario_.paint(window);
+    moneda_.paint(window);
 }
