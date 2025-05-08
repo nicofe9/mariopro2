@@ -4,10 +4,10 @@ using namespace pro2;
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
         monedas_{
-          Moneda({100, 250}),
-          Moneda({200, 250}),
+          Moneda({50, 250}),
+          Moneda({150, 250}),
           Moneda({300, 150}),
-          Moneda({400, 150}),
+          Moneda({350, 150}),
         },
       platforms_{
           Platform(100, 300, 200, 211),
@@ -17,6 +17,9 @@ Game::Game(int width, int height)
       finished_(false) {
     for (int i = 1; i < 20; i++) {
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
+    }
+    for (int i = 1; i < 20; i++) {
+        monedas_.push_back(Moneda({325+ i * 200, 100})); //525, 725, 925...
     }
     
 }
