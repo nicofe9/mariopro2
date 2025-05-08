@@ -3,7 +3,12 @@ using namespace pro2;
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
-     moneda_({100, 150}),
+        monedas_{
+          Moneda({100, 250}),
+          Moneda({200, 250}),
+          Moneda({300, 150}),
+          Moneda({400, 150}),
+        },
       platforms_{
           Platform(100, 300, 200, 211),
           Platform(0, 200, 250, 261),
@@ -13,6 +18,7 @@ Game::Game(int width, int height)
     for (int i = 1; i < 20; i++) {
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
     }
+    
 }
 
 void Game::process_keys(pro2::Window& window) {
@@ -62,5 +68,9 @@ void Game::paint(pro2::Window& window) {
         p.paint(window);
     }
     mario_.paint(window);
-    moneda_.paint(window);
+    for (const Moneda& m : monedas_) {
+        if (!m.is_recogida()) {
+            m.paint(window);
+        }
+    }
 }

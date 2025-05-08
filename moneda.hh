@@ -8,7 +8,7 @@ class Moneda{
  private:
     bool recogida_ = false;
     pro2::Pt pos_;
-    static const std::vector<std::vector<int>> moneda_;
+    static const std::vector<std::vector<int>> moneda_texture_;
 
  public:
     Moneda(pro2::Pt pos) : pos_(pos) {};

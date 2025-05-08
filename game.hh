@@ -9,8 +9,8 @@
 
 class Game {
     Mario                 mario_;
-    Moneda                moneda_;
     std::vector<Platform> platforms_;
+    std::vector<Moneda>   monedas_;
 
     bool finished_;
 

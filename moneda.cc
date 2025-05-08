@@ -14,7 +14,7 @@ using namespace pro2;
     const int c = 0xfff099;    //amarillo crema
 
 
-    const vector<vector<int>> Moneda::moneda_ ={
+    const vector<vector<int>> Moneda::moneda_texture_ ={
         {_, _, b, b, n, n, _, _},
         {_, b, y, c, c, c, n, _},
         {b, y, y, a, a, y, c, n},
@@ -27,7 +27,7 @@ using namespace pro2;
 
      void Moneda::paint(pro2::Window& window) const {
         const Pt top_left = {pos_.x - 6, pos_.y - 15};
-        paint_sprite(window, top_left, moneda_, false);
+        paint_sprite(window, top_left, moneda_texture_, false);
     }
 
     bool Moneda::is_recogida() const {
