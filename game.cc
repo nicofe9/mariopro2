@@ -3,7 +3,7 @@ using namespace pro2;
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
-        monedas_{
+        monedas_{               // Inicialitzem les primeres monedes
           Moneda({50, 250}),
           Moneda({150, 250}),
           Moneda({300, 150}),
@@ -19,7 +19,7 @@ Game::Game(int width, int height)
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
     }
     for (int i = 1; i < 20; i++) {
-        monedas_.push_back(Moneda({325+ i * 200, 100})); //525, 725, 925...
+        monedas_.push_back(Moneda({325+ i * 200, 100})); //fem un bucle per crear una serie de monedes
     }
     
 }
@@ -33,6 +33,18 @@ void Game::process_keys(pro2::Window& window) {
 
 void Game::update_objects(pro2::Window& window) {
     mario_.update(window, platforms_);
+
+    for(Moneda& moneda : monedas_) { 
+        if(!moneda.is_recogida()){
+            const pro2:: Pt mario_pos = mario_.pos();
+            const pro2:: Pt moneda_pos = moneda.pos();
+
+            const int collision_distance = 10; // Distància de col·lisió
+            if(abs(mario_pos.x - moneda_pos.x) < collision_distance && abs(mario_pos.y - moneda_pos.y) < collision_distance) {
+                moneda.recoger(); // Si la moneda no ha estat recollida, la recollim
+            }
+        }
+    }
 }
 
 void Game::update_camera(pro2::Window& window) {
@@ -71,7 +83,7 @@ void Game::paint(pro2::Window& window) {
         p.paint(window);
     }
     mario_.paint(window);
-    for (const Moneda& m : monedas_) {
+    for (const Moneda& m : monedas_) {      // si la moneda no ha estat recollida, la pintem
         if (!m.is_recogida()) {
             m.paint(window);
         }
