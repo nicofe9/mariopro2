@@ -3,7 +3,7 @@ using namespace pro2;
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
-        monedas_{               // Inicialitzem les primeres monedes
+        monedas_{               // inicialitzem les primeres monedes
           Moneda({50, 250}),
           Moneda({150, 250}),
           Moneda({300, 150}),
@@ -19,7 +19,9 @@ Game::Game(int width, int height)
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
     }
     for (int i = 1; i < 20; i++) {
-        monedas_.push_back(Moneda({325+ i * 200, 100})); //fem un bucle per crear una serie de monedes
+        monedas_.push_back(Moneda({325 + i * 200, 125})); //fem un bucle per crear una serie de monedes
+        monedas_.push_back(Moneda({275 + i * 200, 125}));
+        monedas_.push_back(Moneda({375 + i * 200, 125}));
     }
     
 }
@@ -44,6 +46,7 @@ void Game::update_objects(pro2::Window& window) {
                 moneda.recoger(); // Si la moneda no ha estat recollida, la recollim
             }
         }
+        moneda.update_animation(window); // Actualitzem l'animació de la moneda 
     }
 }
 

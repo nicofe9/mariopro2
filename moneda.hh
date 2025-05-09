@@ -8,8 +8,8 @@ class Moneda{
  private:
     bool recogida_ = false;
     pro2::Pt pos_;
-    static const std::vector<std::vector<int>> moneda_texture_;
-
+    static const std::vector<std::vector<std::vector<int>>> moneda_sprites_;
+   int current_sprite_ = 0;
  public:
     Moneda(pro2::Pt pos) : pos_(pos) {};
 
@@ -17,6 +17,7 @@ class Moneda{
     pro2::Pt pos() const { return pos_; }
     bool is_recogida() const;
     void recoger();
+   void update_animation(const pro2::Window& window);
 };
 
 #endif
