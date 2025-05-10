@@ -13,6 +13,7 @@ class Game {
     std::vector<Moneda>   monedas_;
 
     bool finished_;
+    int monedas_recogidas_ = 0;
 
     void process_keys(pro2::Window& window);
     void update_objects(pro2::Window& window);

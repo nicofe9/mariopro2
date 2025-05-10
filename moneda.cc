@@ -1,6 +1,7 @@
 #include "utils.hh"
 #include "moneda.hh"
 #include <vector>
+#include <cmath>
 using namespace std;
 using namespace pro2;
    

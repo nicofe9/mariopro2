@@ -44,6 +44,11 @@ void Game::update_objects(pro2::Window& window) {
             const int collision_distance = 10; // Distància de col·lisió
             if(abs(mario_pos.x - moneda_pos.x) < collision_distance && abs(mario_pos.y - moneda_pos.y) < collision_distance) {
                 moneda.recoger(); // Si la moneda no ha estat recollida, la recollim
+                monedas_recogidas_++;
+                std::cout << "\r Monedes: " << monedas_recogidas_ << std::flush; /*mostrem el nombre de monedes recollides, 
+                                                                                    amb el \r i el flush per sobreescriure la línia, 
+                                                                                    ja que són de la llibreria estandard de C++
+                                                                                    */ 
             }
         }
         moneda.update_animation(window); // Actualitzem l'animació de la moneda 
