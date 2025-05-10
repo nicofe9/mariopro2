@@ -10,10 +10,10 @@
 class Game {
     Mario                 mario_;
     std::vector<Platform> platforms_;
-    std::vector<Moneda>   monedas_;
+    std::vector<Moneda>   monedas_;     //vector de monedes
 
     bool finished_;
-    int monedas_recogidas_ = 0;
+    int monedas_recogidas_ = 0;         //comptador de monedes recollides
 
     void process_keys(pro2::Window& window);
     void update_objects(pro2::Window& window);

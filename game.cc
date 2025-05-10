@@ -36,14 +36,14 @@ void Game::process_keys(pro2::Window& window) {
 void Game::update_objects(pro2::Window& window) {
     mario_.update(window, platforms_);
 
-    for(Moneda& moneda : monedas_) { 
+    for(Moneda& moneda : monedas_) {            // recorrem totes les monedes i fem que si el mario toca la moneda, aquesta desapareix ja que ha estat recollida
         if(!moneda.is_recogida()){
             const pro2:: Pt mario_pos = mario_.pos();
             const pro2:: Pt moneda_pos = moneda.pos();
 
-            const int collision_distance = 10; // Distància de col·lisió
+            const int collision_distance = 10; // distància de col·lisió
             if(abs(mario_pos.x - moneda_pos.x) < collision_distance && abs(mario_pos.y - moneda_pos.y) < collision_distance) {
-                moneda.recoger(); // Si la moneda no ha estat recollida, la recollim
+                moneda.recoger(); // si la moneda no ha estat recollida, la recollim
                 monedas_recogidas_++;
                 std::cout << "\r Monedes: " << monedas_recogidas_ << std::flush; /*mostrem el nombre de monedes recollides, 
                                                                                     amb el \r i el flush per sobreescriure la línia, 

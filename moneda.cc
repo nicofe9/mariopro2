@@ -15,7 +15,7 @@ using namespace pro2;
     const int c = 0xfff099;    //amarillo crema
 
 
-    const vector<vector<vector<int>>> Moneda::moneda_sprites_ ={
+    const vector<vector<vector<int>>> Moneda::moneda_sprites_ ={        //vector dels diferents sprites
         {   {_, _, b, b, n, n, _, _},
             {_, b, y, c, c, c, n, _},
             {b, y, y, a, a, y, c, n},
@@ -57,20 +57,20 @@ using namespace pro2;
         }
     };
 
-     void Moneda::paint(pro2::Window& window) const {
+     void Moneda::paint(pro2::Window& window) const {                   // pinta la moneda a la finestra
         const Pt top_left = {pos_.x - 6, pos_.y - 15};
         paint_sprite(window, top_left, moneda_sprites_[current_sprite_], false);
     }
 
-    bool Moneda::is_recogida() const {
+    bool Moneda::is_recogida() const {      //retorna si la moneda ha estat recollida
         return recogida_;
     }
 
     void Moneda::recoger() {
-        recogida_ = true;
+        recogida_ = true;        //la moneda ha estat recollida
     }
 
-    void Moneda::update_animation(const pro2::Window& window){
+    void Moneda::update_animation(const pro2::Window& window){      //funció que actualitza l'animació de la moneda
         if(recogida_) return;
 
         int frame_counter = window.frame_count();
