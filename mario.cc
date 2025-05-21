@@ -44,10 +44,7 @@ void Mario::apply_physics_() {
         accel_.y = 0;
     }
 
-    // Always falling to check if we aren't grounded
-    // If we are, we will return to the same spot
-
-    const int gravity = 1;  // gravity = 1 pixel / frame_time^2
+    const int gravity = 1; 
     speed_.y += gravity;
 
     if (accel_time_ > 0) {
@@ -73,7 +70,6 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
         jump();
     }
 
-    // Velocitat horitzontal
     speed_.x = 0; 
     if (window.is_key_down(Keys::Left)) {
         speed_.x = -4;
@@ -84,10 +80,8 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
         looking_left_ = speed_.x < 0;
     }
 
-    // Apply acceleration and speed
     apply_physics_();
 
-    // Check position
     set_grounded(false);
 
     for (const Platform& platform : platforms) {
@@ -95,5 +89,6 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
             set_grounded(true);
             set_y(platform.top());
         }
+        
     }
 }

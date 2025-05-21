@@ -15,7 +15,7 @@ Game::Game(int width, int height)
           Platform(250, 400, 150, 161),
       },
       finished_(false) {
-    for (int i = 1; i < 20; i++) {
+    for (int i = 1; i < 40; i++) {
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
     }
     for (int i = 1; i < 20; i++) {
