@@ -60,7 +60,7 @@ void Game::update_objects(pro2::Window& window) {
             const pro2:: Pt mario_pos = mario_.pos();
             const pro2:: Pt moneda_pos = moneda.pos();
 
-            const int collision_distance = 10; // distància de col·lisió
+            const int collision_distance = 15; // distància de col·lisió
             if(abs(mario_pos.x - moneda_pos.x) < collision_distance && abs(mario_pos.y - moneda_pos.y) < collision_distance) {
                 moneda.recoger(); // si la moneda no ha estat recollida, la recollim
                 monedas_recogidas_++;
