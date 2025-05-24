@@ -6,11 +6,14 @@
 #include "platform.hh"
 #include "window.hh"
 #include "moneda.hh"
+#include "finder.hh"
 
 class Game {
     Mario                 mario_;
     std::vector<Platform> platforms_;
     std::vector<Moneda>   monedas_;     //vector de monedes
+    Finder<Platform> platforms_finder_;
+    Finder<Moneda> monedas_finder_;
 
     bool finished_;
     int monedas_recogidas_ = 0;         //comptador de monedes recollides

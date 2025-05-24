@@ -8,6 +8,10 @@ Game::Game(int width, int height)
           Moneda({150, 250}),
           Moneda({300, 150}),
           Moneda({350, 150}),
+            Moneda({400, 150}),
+            Moneda({450, 150}),
+            Moneda({500, 150}), 
+            Moneda({550, 150}),
         },
       platforms_{
           Platform(100, 300, 200, 211),
@@ -15,15 +19,21 @@ Game::Game(int width, int height)
           Platform(250, 400, 150, 161),
       },
       finished_(false) {
-    for (int i = 1; i < 40; i++) {
+    for (int i = 1; i < 1000; i++) {
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
     }
-    for (int i = 1; i < 20; i++) {
+    for (int i = 1; i < 1000; i++) {
         monedas_.push_back(Moneda({325 + i * 200, 125})); //fem un bucle per crear una serie de monedes
         monedas_.push_back(Moneda({275 + i * 200, 125}));
         monedas_.push_back(Moneda({375 + i * 200, 125}));
     }
-    
+
+    for(const Platform& p : platforms_) {
+        platforms_finder_.add(&p); // afegim les plataformes al finder
+    }
+    for(const Moneda& m : monedas_) {
+        monedas_finder_.add(&m); // afegim les monedes al finder
+    }
 }
 
 void Game::process_keys(pro2::Window& window) {
@@ -87,13 +97,18 @@ void Game::update(pro2::Window& window) {
 
 void Game::paint(pro2::Window& window) {
     window.clear(sky_blue);
-    for (const Platform& p : platforms_) {
-        p.paint(window);
+
+    std::set<const Platform*> visibles = platforms_finder_.query(window.camera_rect());
+    for (const Platform* p : visibles) {
+        p->paint(window);
     }
+
     mario_.paint(window);
-    for (const Moneda& m : monedas_) {      // si la moneda no ha estat recollida, la pintem
-        if (!m.is_recogida()) {
-            m.paint(window);
+
+    std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect());
+    for (const Moneda* m : monedes_visibles) {
+        if (!m->is_recogida()) {
+            m->paint(window);
         }
     }
 }
