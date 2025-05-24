@@ -7,9 +7,11 @@
 #include "window.hh"
 #include "moneda.hh"
 #include "finder.hh"
+#include "goomba.hh"
 
 class Game {
     Mario                 mario_;
+    Goomba              goomba_; //goomba que es mou per la pantalla
     std::vector<Platform> platforms_;
     std::vector<Moneda>   monedas_;     //vector de monedes
     Finder<Platform> platforms_finder_;

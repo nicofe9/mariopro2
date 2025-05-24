@@ -3,6 +3,7 @@ using namespace pro2;
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
+    goomba_({150, 200}), // inicialitzem el goomba
         monedas_{               // inicialitzem les primeres monedes
           Moneda({50, 250}),
           Moneda({150, 250}),
@@ -27,6 +28,13 @@ Game::Game(int width, int height)
         monedas_.push_back(Moneda({275 + i * 200, 125}));
         monedas_.push_back(Moneda({375 + i * 200, 125}));
     }
+    for(const Platform& plat:platforms_){
+        pro2::Rect r = plat.get_rect();
+        if (goomba_.pos().x >= r.left && goomba_.pos().x <= r.right && goomba_.pos().y == r.top) {
+            goomba_.set_extrems(r.left, r.right);
+            break;
+    }
+    }
 
     for(const Platform& p : platforms_) {
         platforms_finder_.add(&p); // afegim les plataformes al finder
@@ -45,6 +53,7 @@ void Game::process_keys(pro2::Window& window) {
 
 void Game::update_objects(pro2::Window& window) {
     mario_.update(window, platforms_);
+    goomba_.update_animation(window, platforms_);
 
     for(Moneda& moneda : monedas_) {            // recorrem totes les monedes i fem que si el mario toca la moneda, aquesta desapareix ja que ha estat recollida
         if(!moneda.is_recogida()){
@@ -104,6 +113,8 @@ void Game::paint(pro2::Window& window) {
     }
 
     mario_.paint(window);
+
+    goomba_.paint(window);
 
     std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect());
     for (const Moneda* m : monedes_visibles) {
