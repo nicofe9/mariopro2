@@ -3,6 +3,8 @@
 using namespace std;
 using namespace pro2;
 
+bool dead = false;
+
 const int _ = -1;
 const int r = pro2::red;  //rojo
 const int w = pro2::white; //blanco
@@ -78,6 +80,14 @@ void Mario::jump() {
     }
 }
 
+bool Mario::is_dead()const{
+        return dead;
+    }
+
+    void Mario::matar(){
+        dead = true;
+    }
+
 void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
     last_pos_ = pos_;
     if (window.is_key_down(Keys::Space)) {
@@ -93,7 +103,7 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
     if (speed_.x != 0) {
         looking_left_ = speed_.x < 0;
     }
-
+    
     apply_physics_();
 
     set_grounded(false);
@@ -105,4 +115,6 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
         }
         
     }
+
+
 }

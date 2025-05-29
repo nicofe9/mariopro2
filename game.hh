@@ -14,10 +14,12 @@ class Game {
     Goomba              goomba_; //goomba que es mou per la pantalla
     std::vector<Platform> platforms_;
     std::vector<Moneda>   monedas_;     //vector de monedes
-    Finder<Platform> platforms_finder_;
-    Finder<Moneda> monedas_finder_;
+    Finder<Platform> platforms_finder_;     //finder per les plataformes
+    Finder<Moneda> monedas_finder_;     //finder per les plataformes i les monedes
 
     bool finished_;
+
+    int frame_mort = -1;
     int monedas_recogidas_ = 0;         //comptador de monedes recollides
 
     void process_keys(pro2::Window& window);

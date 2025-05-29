@@ -15,7 +15,10 @@ const int b = 0xE0CD95;
 const int m = 0x45322E;
 
 
-const vector<vector<int>> Goomba::goomba_sprite_ = {
+const vector<vector<int>> Goomba::goomba_sprite_ = {                /*he fet un nou objecte que es mou sobre una plataforma
+                                                                    on més endevant aquest sera un enemic del mario al joc.
+                                                                    actualment nomes forma part del mon del mario al joc i es mou per sobre
+                                                                    de la plataforma*/
     {_, _, _, _, _, _, n, n, n, n, _, _, _, _, _, _},
     {_, _, _, _, n, n, m, m, m, m, n, n, _, _, _, _},
     {_, _, _, n, n, n, n, m, m, n, n, n, n, _, _, _},
@@ -34,31 +37,31 @@ const vector<vector<int>> Goomba::goomba_sprite_ = {
     {n, n, n, n, n, n, n, _, _, _ , n, n, n, n, n, n},
 };
 
-void Goomba::paint(pro2::Window& window) const {
+void Goomba::paint(pro2::Window& window) const {                    // pinta el goomba a la finestra
     if(eliminat) return;
     const Pt top_left = {pos_.x - 6, pos_.y - 15};
     paint_sprite(window, top_left, goomba_sprite_, looking_left_);
 }
 
-bool Goomba::is_eliminat() const {
+bool Goomba::is_eliminat() const {               // retorna si el goomba ha estat eliminat (funció futura)
     return eliminat;
 }
-void Goomba::eliminar() {
+void Goomba::eliminar() {           // funció que elimina el goomba (funció futura)
     eliminat = true;
 }
 
-void Goomba::update_animation(const pro2::Window& window, const std::vector<Platform>& platforms) {
+void Goomba::update_animation(const pro2::Window& window, const std::vector<Platform>& platforms) {     // funció que actualitza l'animació del goomba
     if (eliminat) {
-        return; // Si el goomba ha sido eliminado, no hacemos nada
+        return;
     }
     move(platforms);
 }
-void Goomba::move(const std::vector<Platform>& platforms) {
-    if (eliminat) {
-        return; // Si el goomba ha sido eliminado, no hacemos nada
+void Goomba::move(const std::vector<Platform>& platforms) {       // funció que mou el goomba
+    if (eliminat) {            
+        return;
     }
-    int velocidad;
-    if (looking_left_) {
+    int velocidad;                                  
+    if (looking_left_) {              // si el goomba mira a l'esquerra, la velocitat es negativa
         velocidad = -speed_;
     } else {
         velocidad = speed_;
@@ -67,14 +70,13 @@ void Goomba::move(const std::vector<Platform>& platforms) {
     pro2::Pt next_pos = pos_;
     next_pos.x = pos_.x + velocidad;
 
-    // Limita el movimiento a los extremos
-    if (next_pos.x < extrem_esquer_) {
+    if (next_pos.x < extrem_esquer_) {      // si el goomba es mou a l'esquerra i arriba al extrem esquerre, canvia de direcció
         next_pos.x = extrem_esquer_;
-        looking_left_ = false; // Cambia de dirección a la derecha
+        looking_left_ = false;
     } else {
-        if (next_pos.x > extrem_dret_) {
+        if (next_pos.x > extrem_dret_) {    // si el goomba es mou a la dreta i arriba al extrem dret, canvia de direcció
             next_pos.x = extrem_dret_;
-            looking_left_ = true; // Cambia de dirección a la izquierda
+            looking_left_ = true;
         }
     }
 

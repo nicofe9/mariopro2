@@ -15,6 +15,7 @@ class Mario {
 
     bool grounded_ = false;
 	bool looking_left_ = false;
+    bool dead = false; //boolea que indica si el mario(nosaltres) ha mort per un enemic
 
 	void apply_physics_();
 	
@@ -49,6 +50,9 @@ class Mario {
     void jump();
 
     void update(pro2::Window& window, const std::vector<Platform>& platforms);
+
+    void matar();
+    bool is_dead() const;
 
  private:
     static const std::vector<std::vector<int>> mario_sprite_normal_;
