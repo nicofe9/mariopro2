@@ -22,10 +22,13 @@ class Mario {
  public:
     Mario(pro2::Pt pos) : pos_(pos), last_pos_(pos) {}
 
-    void paint(pro2::Window& window) const;
+    void paint(pro2::Window& window, bool dead_sprite = false) const;
 
     pro2::Pt pos() const {
         return pos_;
+    }
+    pro2::Pt last_pos() const {
+        return last_pos_;
     }
 
     void set_y(int y) {
@@ -48,14 +51,17 @@ class Mario {
     }
 
     void jump();
+    void bounce();
 
     void update(pro2::Window& window, const std::vector<Platform>& platforms);
 
     void matar();
     bool is_dead() const;
+    pro2::Pt speed() const { return speed_; }
 
  private:
     static const std::vector<std::vector<int>> mario_sprite_normal_;
+    static const std::vector<std::vector<int>> mario_sprite_dead_;
 };
 
 #endif

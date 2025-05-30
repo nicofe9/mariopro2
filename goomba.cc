@@ -34,7 +34,7 @@ const vector<vector<int>> Goomba::goomba_sprite_ = {                /*he fet un 
     {_, _, _, n, m, b, b, b, b, b, b, b, n, n, n, _},
     {_, n, n, n, n, m, b, b, b, b, b, n, n, n, n, _},
     {n, n, n, n, n, n, m, m, m, m, m, n, n, n, n, n},
-    {n, n, n, n, n, n, n, _, _, _ , n, n, n, n, n, n},
+    {n, n, n, n, n, n, n, _, _, _, n, n, n, n, n, n},
 };
 
 void Goomba::paint(pro2::Window& window) const {                    // pinta el goomba a la finestra

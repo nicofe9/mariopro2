@@ -1,5 +1,6 @@
 #include "game.hh"
 #include "utils.hh"
+#include "mario.hh"
 using namespace pro2;
 
 const int r = pro2::red;  //rojo
@@ -27,7 +28,10 @@ const std::vector<std::vector<int>> game_over_sprite = {
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
-    goomba_({150, 200}), // inicialitzem el goomba
+        goombas_{
+            Goomba({150, 200}),
+            Goomba({150, 250}),
+        },
         monedas_{               // inicialitzem les primeres monedes
           Moneda({50, 250}),
           Moneda({150, 250}),
@@ -47,6 +51,9 @@ Game::Game(int width, int height)
     for (int i = 1; i < 1000; i++) {
         platforms_.push_back(Platform(250 + i * 200, 400 + i * 200, 150, 161));
     }
+    for (int i = 1; i < 1000; i++){
+        goombas_.push_back(Goomba({150+ i*200, 150}));
+    }
     for (int i = 1; i < 1000; i++) {
         monedas_.push_back(Moneda({325 + i * 200, 125})); //fem un bucle per crear una serie de monedes
         monedas_.push_back(Moneda({275 + i * 200, 125}));
@@ -58,12 +65,15 @@ Game::Game(int width, int height)
     * això es fa per tal que el goomba no es mogui fora de la plataforma i es pugui moure
     * correctament.
     */
-    for(const Platform& plat:platforms_){                                                                     
-        pro2::Rect r = plat.get_rect();
-        if (goomba_.pos().x >= r.left && goomba_.pos().x <= r.right && goomba_.pos().y == r.top) {
-            goomba_.set_extrems(r.left, r.right);
-            break;
-    }
+    for(Goomba& goomba : goombas_){
+        for(const Platform& plat:platforms_){                                                                     
+            pro2::Rect r = plat.get_rect();
+            if (goomba.pos().x >= r.left && goomba.pos().x <= r.right && goomba.pos().y == r.top) {
+                goomba.set_extrems(r.left, r.right);
+                break;
+            }
+        }
+        goombas_finder_.add(&goomba);
     }
 
     for(const Platform& p : platforms_) {
@@ -82,36 +92,60 @@ void Game::process_keys(pro2::Window& window) {
 }
 
 void Game::update_objects(pro2::Window& window) {
-    mario_.update(window, platforms_);
-    goomba_.update_animation(window, platforms_);
+    if(!mario_.is_dead()){
+        mario_.update(window, platforms_);
+    }
+    for(Goomba& goomba: goombas_){
+        goomba.update_animation(window, platforms_); // actualitzem l'animació del goomba
+    }
+        for(Moneda& moneda : monedas_) {            // recorrem totes les monedes i fem que si el mario toca la moneda, aquesta desapareix ja que ha estat recollida
+            if(!moneda.is_recogida()){
+                const pro2:: Pt mario_pos = mario_.pos();
+                const pro2:: Pt moneda_pos = moneda.pos();
 
-    for(Moneda& moneda : monedas_) {            // recorrem totes les monedes i fem que si el mario toca la moneda, aquesta desapareix ja que ha estat recollida
-        if(!moneda.is_recogida()){
-            const pro2:: Pt mario_pos = mario_.pos();
-            const pro2:: Pt moneda_pos = moneda.pos();
-
-            const int collision_distance = 15; // distància de col·lisió
-            if(abs(mario_pos.x - moneda_pos.x) < collision_distance && abs(mario_pos.y - moneda_pos.y) < collision_distance) {
-                moneda.recoger(); // si la moneda no ha estat recollida, la recollim
-                monedas_recogidas_++;
-                std::cout << "\r Monedes: " << monedas_recogidas_ << std::flush; /*mostrem el nombre de monedes recollides, 
-                                                                                    amb el \r i el flush per sobreescriure la línia, 
-                                                                                    ja que són de la llibreria estandard de C++
-                                                                                    */ 
+                const int collision_distance = 15; // distància de col·lisió
+                if(abs(mario_pos.x - moneda_pos.x) < collision_distance && abs(mario_pos.y - moneda_pos.y) < collision_distance) {
+                    moneda.recoger(); // si la moneda no ha estat recollida, la recollim
+                    monedas_recogidas_++;
+                    /* mostrem el nombre de monedes recollides, 
+                     amb el \r i el flush per sobreescriure la línia, 
+                     ja que són de la llibreria estandard de C++ */    
+                    std::cout << "\r Monedes: " << monedas_recogidas_ << std::flush;             
+                }
+                
             }
-            if(abs(mario_pos.x - goomba_.pos().x) < collision_distance && abs(mario_pos.y - goomba_.pos().y) < collision_distance) {
-                if(!mario_.is_dead()) { // si el mario no ha mort, el matam
+            moneda.update_animation(window); // actualitzem l'animació de la moneda 
+        }
+    if(!mario_.is_dead()){ // si el mario no està mort i el goomba no ha estat eliminat, comprovem si el mario toca el goomba
+        for(Goomba& goomba : goombas_){
+            if(goomba.is_eliminat()) continue; // si el goomba ha estat eliminat, no fem res
+            const pro2::Pt mario_pos = mario_.pos();
+            const pro2::Rect goomba_rect = goomba.get_rect();
+            const pro2::Pt mario_last_pos = mario_.last_pos();
+
+         
+            if (mario_pos.x >= goomba_rect.left and mario_pos.x <= goomba_rect.right and mario_pos.y >= goomba_rect.top and mario_pos.y <= goomba_rect.bottom) { // si el mario toca el goomba
+                if(mario_last_pos.y < goomba_rect.top and mario_pos.y >= goomba_rect.top) { // si el mario està per sobre del goomba, el mata
+                    goomba.eliminar();
+                    mario_.set_y(goomba_rect.top - 15); // el mario es posa a sobre del goomba
+                    mario_.bounce(); // el mario rebota
+                }else{
                     mario_.matar();
-                    frame_mort = window.frame_count(); // guardem el frame en el que ha mort el mario
-                    std::cout << "\nMario ha mort!" << std::endl;
+                    frame_mort = window.frame_count();
                 }
             }
         }
-        moneda.update_animation(window); // Actualitzem l'animació de la moneda 
-    }
+     }
+     const int limit_mapa = 600;
+     if(mario_.pos().y > limit_mapa and !mario_.is_dead()){
+        mario_.matar();
+
+        frame_mort = window.frame_count();
+     }
 }
 
-void Game::update_camera(pro2::Window& window) {
+
+void Game::update_camera(pro2::Window& window){
     const Pt pos = mario_.pos();
     const Pt cam = window.camera_center();
 
@@ -140,34 +174,70 @@ void Game::update(pro2::Window& window) {
     update_objects(window);
     update_camera(window);
 
-    if (frame_mort != -1 && window.frame_count() - frame_mort > 3 * 48) {
+    if (frame_mort != -1 and window.frame_count() - frame_mort > 5 * 48) {
         finished_ = true;
     }
 }
 
 void Game::paint(pro2::Window& window) {
-    window.clear(sky_blue);
+     if (mario_.is_dead()) {
+        int frames_since_death = window.frame_count() - frame_mort;
 
-    std::set<const Platform*> visibles = platforms_finder_.query(window.camera_rect()); // obtenim les plataformes visibles a la finestra
-    for (const Platform* p : visibles) {    // recorrem les plataformes visibles i les pintem
-        p->paint(window);   // pintem les plataformes visibles
-    }
+        if (frames_since_death < 48) {
+            window.clear(sky_blue);
 
-    if(mario_.is_dead()){ 
-        window.clear(pro2::black);
-        pro2::Pt top_left = {window.width() / 2 - (int)game_over_sprite[0].size() / 2, window.height() / 2 - (int)game_over_sprite.size() / 2};
-        paint_sprite(window, top_left, game_over_sprite, false);
+            pro2::Rect camera = window.camera_rect();
+            const Color lava = 0xAB2327;
+            paint_rect(window, camera.left, std::max(600, camera.top), camera.right-1, camera.bottom-1, lava);
+            std::set<const Platform*> visibles = platforms_finder_.query(window.camera_rect());
+            for (const Platform* p : visibles) {
+                p->paint(window);
+            }
+
+            mario_.paint(window, true);
+            for(const Goomba& goomba: goombas_){
+            goomba.paint(window);
+            }
+
+            std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect());
+            for (const Moneda* m : monedes_visibles) {
+                if (!m->is_recogida()) {
+                    m->paint(window);
+                }
+            }
+        } else {
+            window.clear(pro2::black);
+            window.set_camera_topleft({0, 0});
+            pro2::Pt top_left = {window.width() / 2 - (int)game_over_sprite[0].size() / 2, window.height() / 2 - (int)game_over_sprite.size() / 2};
+            paint_sprite(window, top_left, game_over_sprite, false);
+        }
         return;
-        
-    } else {
-        mario_.paint(window); // pintem el mario
     }
-    goomba_.paint(window);
 
-    std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect()); // obtenim les monedes visibles a la finestra
-    for (const Moneda* m : monedes_visibles) {      // recorrem les monedes visibles i les pintem
-        if (!m->is_recogida()) {    // si la moneda no ha estat recollida, la pintem
+    
+    window.clear(sky_blue);
+    pro2::Rect camera = window.camera_rect();
+    const Color lava = 0xAB2327;
+    paint_rect(window, camera.left, std::max(600, camera.top), camera.right-1, camera.bottom-1, lava);
+
+    std::set<const Platform*> visibles = platforms_finder_.query(window.camera_rect());
+    for (const Platform* p : visibles) {
+        p->paint(window);
+    }
+
+    mario_.paint(window);
+
+    for(const Goomba& goomba: goombas_){
+        if(!goomba.is_eliminat()) {
+        goomba.paint(window);
+        }
+    }
+
+    std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect());
+    for (const Moneda* m : monedes_visibles) {
+        if (!m->is_recogida()) {
             m->paint(window);
         }
     }
+    
 }

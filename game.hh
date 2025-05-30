@@ -11,11 +11,13 @@
 
 class Game {
     Mario                 mario_;
-    Goomba              goomba_; //goomba que es mou per la pantalla
+    
+    std::vector<Goomba> goombas_;
     std::vector<Platform> platforms_;
     std::vector<Moneda>   monedas_;     //vector de monedes
     Finder<Platform> platforms_finder_;     //finder per les plataformes
     Finder<Moneda> monedas_finder_;     //finder per les plataformes i les monedes
+    Finder<Goomba> goombas_finder_;     //finder per els goombas
 
     bool finished_;
 
