@@ -8,9 +8,11 @@
 #include "moneda.hh"
 #include "finder.hh"
 #include "goomba.hh"
+#include "key.hh"
 
 class Game {
     Mario                 mario_;
+    Key                   key_;
     
     std::vector<Goomba> goombas_;
     std::vector<Platform> platforms_;

@@ -28,8 +28,9 @@ const std::vector<std::vector<int>> game_over_sprite = {
 
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
+        key_({-50, 150}),
         goombas_{
-            Goomba({150, 200}),
+            Goomba({100, 250}),
             Goomba({150, 250}),
         },
         monedas_{               // inicialitzem les primeres monedes
@@ -43,9 +44,10 @@ Game::Game(int width, int height)
             Moneda({550, 150}),
         },
       platforms_{
-          Platform(100, 300, 200, 211),
-          Platform(0, 200, 250, 261),
+          Platform(150, 300, 200, 211),
+          Platform(40, 200, 250, 261),
           Platform(250, 400, 150, 161),
+          Platform(-100, 5, 200, 210),
       },
       finished_(false) {
     for (int i = 1; i < 1000; i++) {
@@ -142,7 +144,18 @@ void Game::update_objects(pro2::Window& window) {
 
         frame_mort = window.frame_count();
      }
+        if (!key_.is_recogida()) {
+            const pro2::Pt mario_pos = mario_.pos();
+            const pro2::Pt key_pos = key_.get_pos();
+            const int collision_distance = 15;
+            if (abs(mario_pos.x - key_pos.x) < collision_distance && abs(mario_pos.y - key_pos.y) < collision_distance) {
+                key_.recoger();
+                // Aquí puedes aumentar un contador de llaves recogidas si lo necesitas
+            }
+        }
+        key_.update_animation(window);
 }
+
 
 
 void Game::update_camera(pro2::Window& window){
@@ -174,70 +187,56 @@ void Game::update(pro2::Window& window) {
     update_objects(window);
     update_camera(window);
 
-    if (frame_mort != -1 and window.frame_count() - frame_mort > 5 * 48) {
+    if (frame_mort != -1 and window.frame_count() - frame_mort > 3 * 48) {
         finished_ = true;
     }
 }
 
 void Game::paint(pro2::Window& window) {
-     if (mario_.is_dead()) {
-        int frames_since_death = window.frame_count() - frame_mort;
-
-        if (frames_since_death < 48) {
-            window.clear(sky_blue);
-
-            pro2::Rect camera = window.camera_rect();
-            const Color lava = 0xAB2327;
-            paint_rect(window, camera.left, std::max(600, camera.top), camera.right-1, camera.bottom-1, lava);
-            std::set<const Platform*> visibles = platforms_finder_.query(window.camera_rect());
-            for (const Platform* p : visibles) {
-                p->paint(window);
-            }
-
-            mario_.paint(window, true);
-            for(const Goomba& goomba: goombas_){
-            goomba.paint(window);
-            }
-
-            std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect());
-            for (const Moneda* m : monedes_visibles) {
-                if (!m->is_recogida()) {
-                    m->paint(window);
-                }
-            }
-        } else {
-            window.clear(pro2::black);
-            window.set_camera_topleft({0, 0});
-            pro2::Pt top_left = {window.width() / 2 - (int)game_over_sprite[0].size() / 2, window.height() / 2 - (int)game_over_sprite.size() / 2};
-            paint_sprite(window, top_left, game_over_sprite, false);
-        }
+    int frames_since_death = 0;
+    if (mario_.is_dead()) {
+        frames_since_death = window.frame_count() - frame_mort;
+    }
+    // Si han pasado más de 48 frames desde la muerte, mostrar Game Over
+    if (mario_.is_dead() && frames_since_death >= 48) {
+        window.clear(pro2::black);
+        window.set_camera_topleft({0, 0});
+        pro2::Pt top_left = {
+            window.width() / 2 - (int)game_over_sprite[0].size() / 2,
+            window.height() / 2 - (int)game_over_sprite.size() / 2
+        };
+        paint_sprite(window, top_left, game_over_sprite, false);
         return;
     }
 
-    
+    // Pintar el mundo normalmente
     window.clear(sky_blue);
     pro2::Rect camera = window.camera_rect();
     const Color lava = 0xAB2327;
     paint_rect(window, camera.left, std::max(600, camera.top), camera.right-1, camera.bottom-1, lava);
 
-    std::set<const Platform*> visibles = platforms_finder_.query(window.camera_rect());
+    std::set<const Platform*> visibles = platforms_finder_.query(camera);
     for (const Platform* p : visibles) {
         p->paint(window);
     }
 
-    mario_.paint(window);
+    // Pintar Mario (sprite muerto si está muriendo)
+    mario_.paint(window, mario_.is_dead());
 
-    for(const Goomba& goomba: goombas_){
-        if(!goomba.is_eliminat()) {
-        goomba.paint(window);
+    if (!key_.is_recogida()) {
+        key_.paint(window);
+    }
+
+    for (const Goomba& goomba : goombas_) {
+        if (!goomba.is_eliminat()) {
+            goomba.paint(window);
         }
     }
 
-    std::set<const Moneda*> monedes_visibles = monedas_finder_.query(window.camera_rect());
+    std::set<const Moneda*> monedes_visibles = monedas_finder_.query(camera);
     for (const Moneda* m : monedes_visibles) {
         if (!m->is_recogida()) {
             m->paint(window);
         }
     }
-    
 }

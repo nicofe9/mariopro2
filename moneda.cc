@@ -5,7 +5,6 @@
 using namespace std;
 using namespace pro2;
    
-    bool recogida_ = false;
 
     const int y = 0xf7d547;     //amarillo comun
     const int _ = -1;
