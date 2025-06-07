@@ -9,9 +9,13 @@ class Key{
         pro2::Pt pos; // posició de la clau;
         int base_y;
         bool recogida_ = false; // booleà que indica si la clau ha estat recollida
-        static const std::vector<std::vector<int>> key_sprite_;
+        
+
     
     public:
+        static const std::vector<std::vector<int>> key_sprite_;
+        static const std::vector<std::vector<int>> key_sprite_black_;
+        
         Key(pro2::Pt pos) : pos(pos), base_y(pos.y){}; // constructor de la clau
         void paint(pro2::Window& window) const; // funció que pinta la clau a la finestra
         pro2::Pt get_pos() const { return pos; } // retorna la posició de la clau

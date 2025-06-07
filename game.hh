@@ -9,17 +9,20 @@
 #include "finder.hh"
 #include "goomba.hh"
 #include "key.hh"
+#include "decor.hh"
 
 class Game {
     Mario                 mario_;
-    Key                   key_;
     
     std::vector<Goomba> goombas_;
     std::vector<Platform> platforms_;
     std::vector<Moneda>   monedas_;     //vector de monedes
+    std::vector<Key>     keys_;
+    std::vector<Decor> decoracions_;
     Finder<Platform> platforms_finder_;     //finder per les plataformes
     Finder<Moneda> monedas_finder_;     //finder per les plataformes i les monedes
     Finder<Goomba> goombas_finder_;     //finder per els goombas
+    Finder<Decor> decoracions_finder_; //finder per les decoracions
 
     bool finished_;
 
