@@ -150,6 +150,17 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
             set_grounded(true);
             set_y(platform.top());
         }
+
+        pro2::Rect r = platform.get_rect();
+        if (pos_.y >= r.top && pos_.y <= r.bottom) {
+            if (pos_.x > r.left && last_pos_.x <= r.left) {
+                // Choca por la izquierda
+                pos_.x = r.left - 1;
+            } else if (pos_.x < r.right && last_pos_.x >= r.right) {
+                // Choca por la derecha
+                pos_.x = r.right + 1;
+            }
+        }
         
     }
 

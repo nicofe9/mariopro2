@@ -12,8 +12,13 @@ Decor(pro2::Pt pos, const std::vector<std::vector<int>>& sprite)
 
     void paint(pro2::Window& window) const;
     pro2::Rect get_rect() const;
+    bool es_tuberia() const {
+        return &sprite_ == &tuberia_;
+    }
+    
     static const std::vector<std::vector<int>> nubes_;
     static const std::vector<std::vector<int>> piedras_;
+    static const std::vector<std::vector<int>> tuberia_;
 
 private:
     pro2::Pt pos_;

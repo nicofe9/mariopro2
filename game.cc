@@ -31,7 +31,7 @@ const std::vector<std::vector<int>> game_over_sprite = {
 Game::Game(int width, int height)
     : mario_({width / 2, 150}),
         keys_{
-            Key({-50, 150}),
+            Key({-50, 100}),
             Key({1040, -60}),
             Key({300, 100}),
         },
@@ -54,7 +54,7 @@ Game::Game(int width, int height)
           Platform(150, 300, 200, 211),
           Platform(40, 200, 250, 700),
           Platform(250, 400, 150, 161),
-          Platform(-100, 5, 200, 210),
+          Platform(-100, 5, 200, 700),
           
 
           Platform(730, 790, 90, 100),
@@ -63,6 +63,7 @@ Game::Game(int width, int height)
           Platform(940, 1000, -10, 0),  // Plataforma 3 (con Goomba)
           Platform(1010, 1070, -50, -40), // Plataforma 4 (con llave)
       },
+        carnivora_({-50, 50}, 135, 100),
 
       
       finished_(false) {
@@ -99,6 +100,9 @@ Game::Game(int width, int height)
         decoracions_.emplace_back(pro2::Pt{400 + i * 200, 0}, Decor::nubes_);
         
     }
+    decoracions_.emplace_back(pro2::Pt{-52, 166}, Decor::tuberia_); 
+    pro2::Rect tubo_rect = decoracions_.back().get_rect();
+    platforms_.push_back(Platform(tubo_rect.left, tubo_rect.right, tubo_rect.top, tubo_rect.bottom));
 
     for (const Platform& plat : platforms_) {
         if(rand() % 2 == 0){
@@ -115,8 +119,8 @@ Game::Game(int width, int height)
         }   
     }
 
-    for(const Platform& p : platforms_) {
-        platforms_finder_.add(&p); // afegim les plataformes al finder
+    for (size_t i = 0; i < platforms_.size() - 1; ++i) {
+    platforms_finder_.add(&platforms_[i]);
     }
     for(const Moneda& m : monedas_) {
         monedas_finder_.add(&m); // afegim les monedes al finder
@@ -168,10 +172,12 @@ void Game::update_objects(pro2::Window& window) {
             if(goomba.is_eliminat()) continue; // si el goomba ha estat eliminat, no fem res
             const pro2::Pt mario_pos = mario_.pos();
             const pro2::Rect goomba_rect = goomba.get_rect();
+            const pro2::Rect planta_rect= carnivora_.get_rect();
             const pro2::Pt mario_last_pos = mario_.last_pos();
 
          
-            if (mario_pos.x >= goomba_rect.left and mario_pos.x <= goomba_rect.right and mario_pos.y >= goomba_rect.top and mario_pos.y <= goomba_rect.bottom) { // si el mario toca el goomba
+            if ((mario_pos.x >= goomba_rect.left and mario_pos.x <= goomba_rect.right and mario_pos.y >= goomba_rect.top and mario_pos.y <= goomba_rect.bottom) or 
+                mario_pos.x >= planta_rect.left and mario_pos.x <= planta_rect.right and mario_pos.y >= planta_rect.top and mario_pos.y <= planta_rect.bottom) { // si el mario toca el goomba o la planta
                 if(mario_last_pos.y < goomba_rect.top and mario_pos.y >= goomba_rect.top) { // si el mario està per sobre del goomba, el mata
                     goomba.eliminar();
                     mario_.set_y(goomba_rect.top - 15); // el mario es posa a sobre del goomba
@@ -183,12 +189,14 @@ void Game::update_objects(pro2::Window& window) {
             }
         }
      }
+     
      const int limit_mapa = 600;
      if(mario_.pos().y > limit_mapa and !mario_.is_dead()){
         mario_.matar();
 
         frame_mort = window.frame_count();
      }
+     carnivora_.update_animation(window);
      for(Key& key : keys_){
         if (!key.is_recogida()) {
             const pro2::Pt mario_pos = mario_.pos();
@@ -262,12 +270,15 @@ void Game::paint(pro2::Window& window) {
     const Color lava = 0xAB2327;
     paint_rect(window, camera.left, std::max(600, camera.top), camera.right-1, camera.bottom-1, lava);
 
+    carnivora_.paint(window);
+
     std::set<const Platform*> visibles = platforms_finder_.query(camera);
     for (const Platform* p : visibles) {
         p->paint(window);
     }
     
     mario_.paint(window, mario_.is_dead());
+    
 
     for(const Key& key_ : keys_) {
         if (!key_.is_recogida()) {

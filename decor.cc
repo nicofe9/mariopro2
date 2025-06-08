@@ -8,6 +8,7 @@ const int n = pro2::black;
 const int b = pro2::white;
 const int g = 0xcdcdcd;
 const int o = 0x474b4e;
+const int v = pro2::green;
 
 const vector<vector<int>> Decor::nubes_ = {
     {_, _, _, _, _, n, n, n, n, _, _, _, _, _},
@@ -26,6 +27,44 @@ const vector<vector<int>> Decor::piedras_ = {
    {_, n, g, g, g, n},
    {n, g, g, o, o, n},
    {_, n, n, n, n, _},
+};
+
+const vector<vector<int>> Decor::tuberia_ = {
+    {n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n ,n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n},
+    {_, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n ,_},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
+    {_, _, n, v, v, v, v, v, v, v, v, v, v, v, v, v, v, n, _, _},
 };
 
 pro2::Rect Decor::get_rect() const {

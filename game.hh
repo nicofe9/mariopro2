@@ -10,9 +10,11 @@
 #include "goomba.hh"
 #include "key.hh"
 #include "decor.hh"
+#include "planta.hh"
 
 class Game {
     Mario                 mario_;
+    Planta                carnivora_;
     
     std::vector<Goomba> goombas_;
     std::vector<Platform> platforms_;
