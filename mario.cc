@@ -163,6 +163,4 @@ void Mario::update(pro2::Window& window, const vector<Platform>& platforms) {
         }
         
     }
-
-
 }

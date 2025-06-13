@@ -138,8 +138,47 @@ void Game::process_keys(pro2::Window& window) {
 }
 
 void Game::update_objects(pro2::Window& window) {
+    std::vector<Platform> plataformas_temp = platforms_;
+    if (!bloc_.destruido()) {
+        plataformas_temp.push_back(Platform(bloc_.get_rect().left, bloc_.get_rect().right, bloc_.get_rect().top, bloc_.get_rect().bottom));
+    }
     if(!mario_.is_dead()){
         mario_.update(window, platforms_);
+    }
+    
+    if (!bloc_.destruido() && llave_oculta_) {
+        pro2::Rect bloque_rect = bloc_.get_rect();
+        pro2::Pt mario_pos = mario_.pos();
+        pro2::Pt mario_last_pos = mario_.last_pos();
+        // Mario sube y cruza el borde inferior del bloque
+        if (mario_last_pos.y > bloque_rect.bottom && mario_pos.y <= bloque_rect.bottom &&
+            mario_pos.x + 8 > bloque_rect.left && mario_pos.x - 8 < bloque_rect.right) {
+            bloc_.destruir();
+            llave_oculta_ = false;
+            mario_.bounce();
+            // Iniciar animación de la llave
+            llave_animando_ = true;
+            llave_anim_frame_ = 0;
+            llave_y_inicial_ = 100;
+            llave_y_animada_ = 100;
+        }
+    }
+
+    // Animar la llave saliendo hacia arriba
+    if (llave_animando_) {
+        llave_anim_frame_++;
+        // Sube 30 píxeles en 20 frames (ajusta a tu gusto)
+        llave_y_animada_ = llave_y_inicial_ - (llave_anim_frame_ < llave_anim_max_frames_ ? llave_anim_frame_ * 1.5 : llave_anim_max_frames_ * 1.5);
+        if (llave_anim_frame_ >= llave_anim_max_frames_) {
+            llave_animando_ = false;
+            llave_y_animada_ = llave_y_inicial_ - llave_anim_max_frames_ * 1.5;
+        }
+        // Actualiza la posición de la llave especial
+        for (Key& key : keys_) {
+            if (key.get_pos().x == 300 && key.get_pos().y == 100) {
+                key.set_pos({300, (int)llave_y_animada_});
+            }
+        }
     }
 
     pro2::Rect camera = window.camera_rect();
@@ -197,14 +236,20 @@ void Game::update_objects(pro2::Window& window) {
         frame_mort = window.frame_count();
      }
      carnivora_.update_animation(window);
+
      for(Key& key : keys_){
+        if (key.get_pos().x == 300 && llave_oculta_) {
+            continue;
+        }
+        if (key.get_pos().x == 300 && llave_animando_) {
+            continue;
+        }
         if (!key.is_recogida()) {
             const pro2::Pt mario_pos = mario_.pos();
             const pro2::Pt key_pos = key.get_pos();
             const int collision_distance = 15;
             if (abs(mario_pos.x - key_pos.x) < collision_distance && abs(mario_pos.y - key_pos.y) < collision_distance) {
                 key.recoger();
-                // Aquí puedes aumentar un contador de llaves recogidas si lo necesitas
             }
         }
         key.update_animation(window);
@@ -261,6 +306,7 @@ void Game::paint(pro2::Window& window) {
             window.height() / 2 - (int)game_over_sprite.size() / 2
         };
         paint_sprite(window, top_left, game_over_sprite, false);
+
         return;
     }
 
@@ -271,16 +317,26 @@ void Game::paint(pro2::Window& window) {
     paint_rect(window, camera.left, std::max(600, camera.top), camera.right-1, camera.bottom-1, lava);
 
     carnivora_.paint(window);
+     
+    std::set<const Decor*> decoracions_visibles = decoracions_finder_.query(camera);
+    for (const Decor* decor : decoracions_visibles) {
+        decor->paint(window);
+    }
 
     std::set<const Platform*> visibles = platforms_finder_.query(camera);
     for (const Platform* p : visibles) {
         p->paint(window);
     }
+
+    bloc_.paint(window);
     
     mario_.paint(window, mario_.is_dead());
     
 
     for(const Key& key_ : keys_) {
+        if (key_.get_pos().x == 300 && key_.get_pos().y == 100 && llave_oculta_) {
+            continue; // No pintar la llave especial si está oculta
+        }
         if (!key_.is_recogida()) {
             key_.paint(window);
         }
@@ -306,11 +362,6 @@ void Game::paint(pro2::Window& window) {
         }
     }
     
-    std::set<const Decor*> decoracions_visibles = decoracions_finder_.query(camera);
-    for (const Decor* decor : decoracions_visibles) {
-        decor->paint(window);
-    }
-
     std::set<const Goomba*> goombas_visibles = goombas_finder_.query(camera);
     for (const Goomba* goomba : goombas_visibles) {
         if (!goomba->is_eliminat()) {
@@ -324,4 +375,5 @@ void Game::paint(pro2::Window& window) {
             m->paint(window);
         }
     }
+   
 }

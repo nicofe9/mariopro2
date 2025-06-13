@@ -66,8 +66,14 @@ void Key::recoger(){
     recogida_ = true;
 }
 
+
+void Key::set_pos(const pro2::Pt& pos) {
+    this->pos = pos;
+}
+
+
 void Key::update_animation(const pro2::Window& window) {
     if (recogida_) return;
     int frame = window.frame_count();
     pos.y = base_y + int(8 * sin(frame / 12.0));
-}
+} 

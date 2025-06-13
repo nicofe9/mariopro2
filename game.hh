@@ -10,11 +10,20 @@
 #include "goomba.hh"
 #include "key.hh"
 #include "decor.hh"
+#include "bloc.hh"
 #include "planta.hh"
 
 class Game {
     Mario                 mario_;
     Planta                carnivora_;
+    Bloc bloc_{pro2::Pt{300, 84}};
+
+    bool llave_animando_ = false;
+    int llave_anim_frame_ = 0;
+    int llave_anim_max_frames_ = 20;
+    int llave_y_inicial_ = 100;
+    int llave_y_animada_ = 100;
+    bool llave_oculta_ = true;
     
     std::vector<Goomba> goombas_;
     std::vector<Platform> platforms_;

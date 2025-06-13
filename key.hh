@@ -24,7 +24,7 @@ class Key{
         pro2::Rect get_rect() const {
             return {pos.x - 6, pos.y - 15, pos.x + 6, pos.y + 1};
         }
-
+        void set_pos(const pro2::Pt& pos);
         void update_animation(const pro2::Window& window);
         
 };
