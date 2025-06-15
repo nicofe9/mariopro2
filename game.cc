@@ -34,6 +34,12 @@ Game::Game(int width, int height)
             Key({-50, 100}),
             Key({1040, -60}),
             Key({300, 100}),
+            Key({400, 100}),
+            Key({500, 100}),
+
+            Key({600, 100}),
+            Key({700, 100}),
+            
         },
         goombas_{
             Goomba({100, 250}),
@@ -52,9 +58,9 @@ Game::Game(int width, int height)
         },
       platforms_{
           Platform(150, 300, 200, 211),
-          Platform(40, 200, 250, 700),
+          Platform(40, 200, 250, 800),
           Platform(250, 400, 150, 161),
-          Platform(-100, 5, 200, 700),
+          Platform(-100, 5, 200, 800),
           
 
           Platform(730, 790, 90, 100),
@@ -138,48 +144,151 @@ void Game::process_keys(pro2::Window& window) {
 }
 
 void Game::update_objects(pro2::Window& window) {
-    std::vector<Platform> plataformas_temp = platforms_;
-    if (!bloc_.destruido()) {
-        plataformas_temp.push_back(Platform(bloc_.get_rect().left, bloc_.get_rect().right, bloc_.get_rect().top, bloc_.get_rect().bottom));
+    if(transicion_nuevo_mapa_){
+        if (transicion_nuevo_mapa_ && window.frame_count() - frame_transicion_ > 48) {
+        transicion_nuevo_mapa_ = false;
+        en_nuevo_mapa_ = true;
+        frame_entrada_nuevo_mapa_ = window.frame_count();
+            if (!nuevo_mapa_inicializado_) {
+                platforms_.clear();
+                goombas_.clear();
+                monedas_.clear();
+                decoracions_.clear();
+                plataformas_nuevo_mapa_.clear();
+
+                int plataforma_top = window.height() * 3 / 4;
+                plataformas_nuevo_mapa_.emplace_back(
+                    500, 3000, plataforma_top, 700
+                );
+
+                puerta_ = Door({1125, plataforma_top-2});
+                bowser_ = Bowser({1700, plataforma_top - 39});
+                peach_ = Peach({1750, plataforma_top - 10});
+                bloc_flor_ = Bloc({1200, 180});
+                
+                flor_visible_ = false;
+                flor_recogida_ = false;
+                nuevo_mapa_inicializado_ = true;
+                flor_pos_ = {1200, 185};
+                mario_.set_y(plataforma_top - 26);
+                mario_.set_grounded(true);
+                }
+            }
+        return; // si estem en una transició al nou mapa, no actualitzem els objectes
     }
-    if(!mario_.is_dead()){
-        mario_.update(window, platforms_);
+    if (!bloc_flor_.destruido() && en_nuevo_mapa_) {
+    pro2::Rect bloque_rect = bloc_flor_.get_rect();
+    pro2::Pt mario_pos = mario_.pos();
+    pro2::Pt mario_last_pos = mario_.last_pos();
+    if (mario_pos.y <= bloque_rect.bottom &&
+        mario_pos.x + 8 > bloque_rect.left && mario_pos.x - 8 < bloque_rect.right) {
+        bloc_flor_.destruir();
+        mario_.bounce_down();
+        flor_visible_ = true;
+
+        flor_animando_ = true;
+        flor_anim_frame_ = 0;
+        flor_base_y_ = flor_pos_.y;
+        frame_flor_aparece_ = window.frame_count();
+        }
     }
-    
-    if (!bloc_.destruido() && llave_oculta_) {
-        pro2::Rect bloque_rect = bloc_.get_rect();
+    if (flor_visible_ && !flor_recogida_) {
         pro2::Pt mario_pos = mario_.pos();
-        pro2::Pt mario_last_pos = mario_.last_pos();
-        // Mario sube y cruza el borde inferior del bloque
-        if (mario_last_pos.y > bloque_rect.bottom && mario_pos.y <= bloque_rect.bottom &&
-            mario_pos.x + 8 > bloque_rect.left && mario_pos.x - 8 < bloque_rect.right) {
-            bloc_.destruir();
-            llave_oculta_ = false;
-            mario_.bounce();
-            // Iniciar animación de la llave
-            llave_animando_ = true;
-            llave_anim_frame_ = 0;
-            llave_y_inicial_ = 100;
-            llave_y_animada_ = 100;
+        if (window.frame_count()-frame_flor_aparece_ > 48 and  (mario_pos.x - flor_pos_.x) < 16 && abs(mario_pos.y - flor_pos_.y) < 32) {
+            flor_recogida_ = true;
+            flor_visible_ = false;
         }
     }
 
-    // Animar la llave saliendo hacia arriba
-    if (llave_animando_) {
-        llave_anim_frame_++;
-        // Sube 30 píxeles en 20 frames (ajusta a tu gusto)
-        llave_y_animada_ = llave_y_inicial_ - (llave_anim_frame_ < llave_anim_max_frames_ ? llave_anim_frame_ * 1.5 : llave_anim_max_frames_ * 1.5);
-        if (llave_anim_frame_ >= llave_anim_max_frames_) {
-            llave_animando_ = false;
-            llave_y_animada_ = llave_y_inicial_ - llave_anim_max_frames_ * 1.5;
-        }
-        // Actualiza la posición de la llave especial
-        for (Key& key : keys_) {
-            if (key.get_pos().x == 300 && key.get_pos().y == 100) {
-                key.set_pos({300, (int)llave_y_animada_});
-            }
+    if(!mario_.is_dead()){
+        if (en_nuevo_mapa_) {
+            mario_.update(window, plataformas_nuevo_mapa_);
+            bowser_.update(mario_.pos());
+        } else {
+            mario_.update(window, platforms_);
         }
     }
+    
+        if (!bloc_.destruido() && llave_oculta_) {
+            pro2::Rect bloque_rect = bloc_.get_rect();
+            pro2::Pt mario_pos = mario_.pos();
+            pro2::Pt mario_last_pos = mario_.last_pos();
+            if (mario_last_pos.y > bloque_rect.bottom && mario_pos.y <= bloque_rect.bottom &&
+                mario_pos.x + 8 > bloque_rect.left && mario_pos.x - 8 < bloque_rect.right) {
+                bloc_.destruir();
+                llave_oculta_ = false;
+                mario_.bounce_down();
+
+                llave_animando_ = true;
+                llave_anim_frame_ = 0;
+                llave_y_inicial_ = 100;
+                llave_y_animada_ = 100;
+            }
+        }
+
+        if (llave_animando_) {
+            llave_anim_frame_++;
+            llave_y_animada_ = llave_y_inicial_ - (llave_anim_frame_ < llave_anim_max_frames_ ? llave_anim_frame_ * 1.5 : llave_anim_max_frames_ * 1.5);
+            if (llave_anim_frame_ >= llave_anim_max_frames_) {
+                llave_animando_ = false;
+                llave_y_animada_ = llave_y_inicial_ - llave_anim_max_frames_ * 1.5;
+            }
+            for (Key& key : keys_) {
+                if (key.get_pos().x == 300 && key.get_pos().y == 100) {
+                    key.set_pos({300, (int)llave_y_animada_});
+                }
+            }
+        }
+        if (flor_animando_) {
+            flor_anim_frame_++;
+            if (flor_anim_frame_ < flor_anim_max_frames_) {
+                flor_pos_.y = flor_base_y_ - flor_anim_frame_ * 1.5;
+            } else {
+            flor_pos_.y = flor_base_y_ - flor_anim_max_frames_ * 1.5 + int(8 * std::sin((flor_anim_frame_ - flor_anim_max_frames_) / 12.0));
+            }
+        }
+    if (en_nuevo_mapa_ && bowser_.is_alive()) {
+        for (auto& fireball : bowser_.fireballs()) {
+            if (fireball.active) {
+                pro2::Rect mario_rect = {mario_.pos().x - 8, mario_.pos().y - 26, mario_.pos().x + 8, mario_.pos().y + 1};
+                pro2::Rect fire_rect = {fireball.pos.x - 4, fireball.pos.y - 4, fireball.pos.x + 4, fireball.pos.y + 4};
+                if (!(mario_rect.right < fire_rect.left || mario_rect.left > fire_rect.right ||
+                    mario_rect.bottom < fire_rect.top || mario_rect.top > fire_rect.bottom)) {
+                    mario_.matar();
+                    frame_mort = window.frame_count();
+                    fireball.active = false;
+                }
+            }
+        }
+        pro2::Rect bowser_rect = bowser_.get_rect();
+    for (auto& iceball : iceballs_) {
+        if (!iceball.active) continue;
+        pro2::Rect ice_rect = {iceball.pos.x - 4, iceball.pos.y - 4, iceball.pos.x + 4, iceball.pos.y + 4};
+        if (!(ice_rect.right < bowser_rect.left || ice_rect.left > bowser_rect.right ||
+              ice_rect.bottom < bowser_rect.top || ice_rect.top > bowser_rect.bottom)) {
+            bowser_.recibir_danio();
+            iceball.active = false;
+        }
+    }
+    }
+    if (en_nuevo_mapa_ && !mario_.is_dead() && flor_recogida_) {
+        if (window.is_key_down(Keys::Tab)) {
+            static int iceball_cooldown = 0;
+            if (iceball_cooldown == 0) {
+                int dir = mario_.is_looking_left() ? -1 : 1;
+                pro2::Pt speed = {6*dir, 0};
+                pro2::Pt iceball_pos = {mario_.pos().x, mario_.pos().y - 13};
+                iceballs_.emplace_back(iceball_pos, speed);
+                iceball_cooldown = 15; // cooldown de 15 frames
+            }
+            else {
+                iceball_cooldown--;
+            }
+        }
+}
+for (auto& iceball : iceballs_) {
+    if (iceball.active) iceball.update();
+}
 
     pro2::Rect camera = window.camera_rect();
     std::set<const Goomba*> goombas_visibles = goombas_finder_.query(camera);
@@ -254,6 +363,43 @@ void Game::update_objects(pro2::Window& window) {
         }
         key.update_animation(window);
      }
+
+    int recogidas = 0;
+    for (const Key& key : keys_) {
+        if (key.is_recogida()) recogidas++;
+    }
+    if (recogidas == 3) puerta_visible_ = true;
+
+    if (puerta_visible_ && !en_nuevo_mapa_) {
+        const pro2::Pt mario_pos = mario_.pos();
+        const pro2::Rect puerta_rect = puerta_.get_rect();
+        if (mario_pos.x >= puerta_rect.left && mario_pos.x <= puerta_rect.right &&
+            mario_pos.y >= puerta_rect.top && mario_pos.y <= puerta_rect.bottom) {
+            if (window.is_key_down(Keys::Up) and !puerta_.is_abierta()) {
+                puerta_.abrir();
+                esperando_transicion_puerta_ = true;
+                frame_transicion_ = window.frame_count();
+            } else if (window.frame_count() - frame_transicion_ >= 24 && esperando_transicion_puerta_) {
+                transicion_nuevo_mapa_ = true;
+                esperando_transicion_puerta_ = false;
+                frame_transicion_ = window.frame_count();
+            }
+        }
+    }
+    if (en_nuevo_mapa_) {
+        if (!bowser_.is_alive()) {
+            peach_.quitar_jaula();
+            peach_.set_estado(Peach::FELIZ);
+        }
+        if (!peach_rescatada_ && !bowser_.is_alive()) {
+            pro2::Rect mario_rect = {mario_.pos().x - 8, mario_.pos().y - 26, mario_.pos().x + 8, mario_.pos().y + 1};
+            pro2::Rect peach_rect = {peach_.pos().x - 8, peach_.pos().y - 32, peach_.pos().x + 8, peach_.pos().y + 1};
+            if (!(mario_rect.right < peach_rect.left -5 || mario_rect.bottom < peach_rect.top || mario_rect.top > peach_rect.bottom)) {
+                peach_rescatada_ = true;
+                frame_peach_rescatada_ = window.frame_count();
+            }
+        }
+    }
 }
 
 
@@ -262,10 +408,10 @@ void Game::update_camera(pro2::Window& window){
     const Pt pos = mario_.pos();
     const Pt cam = window.camera_center();
 
-    const int left = cam.x - window.width() / 4;
-    const int right = cam.x + window.width() / 4;
-    const int top = cam.y - window.height() / 4;
-    const int bottom = cam.y + window.height() / 4;
+    const int left = cam.x - window.width() / 20;
+    const int right = cam.x + window.width() / 20;
+    const int top = cam.y - window.height() / 8;
+    const int bottom = cam.y + window.height() / 8;
 
     int dx = 0, dy = 0;
     if (pos.x > right) {
@@ -290,6 +436,9 @@ void Game::update(pro2::Window& window) {
     if (frame_mort != -1 and window.frame_count() - frame_mort > 3 * 48) {
         finished_ = true;
     }
+    if (peach_rescatada_ && window.frame_count() - frame_peach_rescatada_ > 48*2) {
+        finished_ = true;
+    }
 }
 
 void Game::paint(pro2::Window& window) {
@@ -297,7 +446,7 @@ void Game::paint(pro2::Window& window) {
     if (mario_.is_dead()) {
         frames_since_death = window.frame_count() - frame_mort;
     }
-    
+
     if (mario_.is_dead() && frames_since_death >= 48) {
         window.clear(pro2::black);
         window.set_camera_topleft({0, 0});
@@ -309,6 +458,32 @@ void Game::paint(pro2::Window& window) {
 
         return;
     }
+
+    if (en_nuevo_mapa_) {
+        window.clear(0x222288); // color de fondo diferente
+        for (const Platform& p : plataformas_nuevo_mapa_) {
+            p.paint(window);
+        }
+        if (frame_entrada_nuevo_mapa_ != -1 && window.frame_count() - frame_entrada_nuevo_mapa_ < 24) {
+            puerta_.abrir();
+            puerta_.paint(window);
+        } else {
+            puerta_.cerrar();
+            puerta_.paint(window);
+        }
+        bowser_.paint(window);
+        mario_.paint(window, mario_.is_dead());
+        peach_.paint(window);
+        bloc_flor_.paint(window);
+        if (flor_visible_ && !flor_recogida_) {
+            paint_sprite(window, flor_pos_, Flor::flor_sprite_, false);
+        }
+        for (const auto& iceball : iceballs_) {
+            if (iceball.active) iceball.paint(window);
+        }
+        return;
+    }
+    
 
     window.clear(sky_blue);
     pro2::Rect camera = window.camera_rect();
@@ -329,13 +504,10 @@ void Game::paint(pro2::Window& window) {
     }
 
     bloc_.paint(window);
-    
-    mario_.paint(window, mario_.is_dead());
-    
 
     for(const Key& key_ : keys_) {
         if (key_.get_pos().x == 300 && key_.get_pos().y == 100 && llave_oculta_) {
-            continue; // No pintar la llave especial si está oculta
+            continue;
         }
         if (!key_.is_recogida()) {
             key_.paint(window);
@@ -346,6 +518,19 @@ void Game::paint(pro2::Window& window) {
     for (const Key& key : keys_) {
         if (key.is_recogida()) recogidas++;
     }
+    if (recogidas == 3) puerta_visible_ = true;
+
+    if (puerta_visible_ && !en_nuevo_mapa_) {
+        puerta_.paint(window);
+    }
+    if(puerta_.is_abierta() && !en_nuevo_mapa_) {
+    } 
+    if (transicion_nuevo_mapa_) {
+        window.clear(pro2::black);
+        return;
+    }
+    mario_.paint(window, mario_.is_dead());
+
     int margen = 10;
     int separacion = 30;
     pro2::Rect cam = window.camera_rect();

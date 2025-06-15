@@ -75,6 +75,29 @@ const vector<vector<int>> Mario::mario_sprite_dead_ = {
     {_, _, _, _, _, _, _, _, _, _, n, n, _, _, _, _},
    
 };
+const vector<vector<int>> Mario::mario_sprite_backward_ = {
+    
+};
+
+const int i = 0x00BFFF;
+const int f = 0x2f2c79;
+const int u = 0x1a66cc;
+const int c = 0x9eecff;
+const vector<vector<int>> Iceball::iceball_sprite_ = {
+    {_, _, _, _, _, _, f, _, _, f},
+    {_, _, _, _, _, _, f, f, _, f, f},
+    {_, _, _, _, _, _, f, f, f, f, f, f},
+    {_, _, f, f, f, f, u, u, i, u, u, f, f},
+    {_, f, f, _, f, u, i, i, i, c, i, u, f, f},
+    {_, _, _, _, _, f, u, i, c, w, c, i, i, f},
+    {f, f, _, _, f, u, i, c, w, c, i, i, i, f},
+    {f, f, f, f, i, i, i, i, c, i, i, i, f, f},
+    {_, f, f, u, i, i, i, i, i, i, u, u, f},
+    {_, _, f, f, f, f, u, u, i, i, f, f},
+    {_, _, _, _, _, f, f, f, f, f, f},
+};
+    
+
 
 void Mario::paint(pro2::Window& window, bool dead_sprite) const {
     const Pt top_left = {pos_.x - 8, pos_.y - 26};
@@ -114,6 +137,11 @@ void Mario::jump() {
 
 void Mario::bounce(){
     speed_.y = -8;
+    grounded_ = false;
+}
+
+void Mario::bounce_down(){
+    speed_.y = 0;
     grounded_ = false;
 }
 

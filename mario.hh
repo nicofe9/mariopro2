@@ -5,6 +5,30 @@
 #include <vector>
 #include "platform.hh"
 #include "window.hh"
+#include "utils.hh"
+
+struct Iceball {
+    pro2::Pt pos;
+    pro2::Pt speed;
+    bool active = true;
+    int frame = 0;
+    int base_y = 0;
+    static const std::vector<std::vector<int>> iceball_sprite_;
+
+    Iceball(pro2::Pt p, pro2::Pt s)
+        : pos(p), speed(s), base_y(p.y) {}
+
+    void update() {
+        frame++;
+        pos.x += speed.x;
+        pos.y = base_y + int(10 * std::sin(frame / 8.0)) + speed.y;
+    }
+
+    void paint(pro2::Window& window) const {
+        if (active)
+            paint_sprite(window, {pos.x-4, pos.y-4}, iceball_sprite_, false);
+    }
+};
 
 class Mario {
  private:
@@ -52,6 +76,11 @@ class Mario {
 
     void jump();
     void bounce();
+    void bounce_down();
+
+    bool is_looking_left() const {
+        return looking_left_;
+    }
 
     void update(pro2::Window& window, const std::vector<Platform>& platforms);
 
@@ -62,6 +91,7 @@ class Mario {
  private:
     static const std::vector<std::vector<int>> mario_sprite_normal_;
     static const std::vector<std::vector<int>> mario_sprite_dead_;
+    static const std::vector<std::vector<int>> mario_sprite_backward_;
 };
 
 #endif
