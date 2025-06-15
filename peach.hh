@@ -13,21 +13,15 @@ private:
     Estado estado_ = LLORANDO;
     static const std::vector<std::vector<int>> peach_llorando_sprite_;
     static const std::vector<std::vector<int>> peach_feliz_sprite_;
-    static const std::vector<std::vector<int>> jaula_sprite_;
-    bool mostrar_jaula_ = true;
 public:
     Peach(pro2::Pt pos) : pos_(pos) {}
 
     void set_estado(Estado e) { estado_ = e; }
     Estado estado() const { return estado_; }
-    void quitar_jaula() { mostrar_jaula_ = false; }
     pro2::Pt pos() const { return pos_; }
 
     void paint(pro2::Window& window) const {
         if (estado_ == OCULTA) return;
-        if (mostrar_jaula_) {
-            paint_sprite(window, {pos_.x - 8, pos_.y - 32}, jaula_sprite_, false);
-        }
         if (estado_ == LLORANDO) {
             paint_sprite(window, {pos_.x - 8, pos_.y - 32}, peach_llorando_sprite_, false);
         } else if (estado_ == FELIZ) {

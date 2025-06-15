@@ -38,12 +38,23 @@ private:
     std::vector<Fireball> fireballs_;
     int fireball_cooldown_ = 0;
     static const std::vector<std::vector<int>> bowser_sprite_;
+    static const std::vector<std::vector<int>> bowser_dead;
+
+    int parpadeo_frames_ = 0;
+    int parpadeos_totales_ = 0;
+    static constexpr int PARPADEOS_MAX_ = 8;
+    int frame_bowser_muerto_ = -1;
 public:
     Bowser(pro2::Pt pos) : pos_(pos) {}
 
     void paint(pro2::Window& window) const {
-        if (alive_) {
-            paint_sprite(window, pos_, bowser_sprite_, false);
+        bool pintar = true;
+        if(parpadeo_frames_ > 0){
+            pintar = (parpadeo_frames_ % 2 == 0);
+        }
+
+        if (alive_ and pintar) {
+        paint_sprite(window, pos_, bowser_sprite_, false);
         int bar_width = 40;
         int bar_height = 5;
         int x = pos_.x;
@@ -63,10 +74,17 @@ public:
         }
         for (const auto& f : fireballs_) f.paint(window);
         }
+        else if (frame_bowser_muerto_ != -1) {
+            int frames = window.frame_count() - frame_bowser_muerto_;
+            if (frames < 96) {
+                paint_sprite(window, pos_, bowser_dead, false);
+            }
+        }
     }
 
     void update(const pro2::Pt& mario_pos) {
         if (!alive_) return;
+        if(parpadeo_frames_ > 0) parpadeo_frames_--;
         if (fireball_cooldown_ > 0) fireball_cooldown_--;
         else {
             int distancia = std::abs(mario_pos.x - pos_.x);
@@ -89,10 +107,15 @@ public:
         fireballs_.emplace_back(pro2::Pt{pos_.x + 20, pos_.y + 30}, speed);
     }
 
-    void recibir_danio() {
+    void recibir_danio(pro2::Window& window) {
         if (!alive_) return;
         vidas_--;
-        if (vidas_ <= 0) alive_ = false;
+        if (vidas_ <= 0) {
+            alive_ = false;
+            frame_bowser_muerto_ = window.frame_count();
+        }
+        parpadeo_frames_ = PARPADEOS_MAX_;
+        parpadeos_totales_ = 0;
     }
 
     int vidas_max() const { return vidas_max_; }

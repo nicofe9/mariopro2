@@ -17,6 +17,11 @@ const int k = 0x6F4E37; //marrón oscuro
 const int b = 0xF8E3B7; //beige
 const int a = 0xFFD700; //amarillo
 
+const int i = 0x00BFFF;
+const int f = 0x2f2c79;
+const int u = 0x1a66cc;
+const int c = 0x9eecff;
+
 // clang-format off
 const vector<vector<int>> Mario::mario_sprite_normal_ = {
    {_, _, _, _, _, _, _, _, n, n, n, n, n, _, _, _, _},
@@ -48,6 +53,37 @@ const vector<vector<int>> Mario::mario_sprite_normal_ = {
    {_, _, n, n, _, _, _, _, _, _, _, _, _, n, _, _, _},
    
 };
+const vector<vector<int>> Mario::mario_sprite_hielo_ = {
+   {_, _, _, _, _, _, _, _, n, n, n, n, n, _, _, _, _},
+{_, _, _, _, _, _, n, n, w, w, a, w, w, n, _, _, _},
+{_, _, _, _, _, n, w, w, b, a, a, w, b, n, _, _, _},
+{_, _, _, _, n, w, b, b, n, n, n, n, n, n, n, _, _},
+{_, _, _, n, w, b, n, n, n, n, n, n, n, n, n, n, _},
+{_, _, n, b, b, n, n, n, n, n, n, n, n, n, n, n, _},
+{_, _, n, b, b, n, n, o, w, w, o, w, w, n, n, _, _},
+{_, _, o, p, n, n, o, o, w, n, p, n, w, _, _, _, _},
+{_, o, m, p, n, n, o, p, w, n, p, n, w, p, m, _, _},
+{_, o, m, o, o, n, n, p, p, o, o, p, p, p, m, _, _},
+{_, _, o, o, o, n, p, p, n, m, o, o, o, o, m, _, _},
+{_, _, n, n, o, o, o, n, n, n, n, n, n, n, n, n, _},
+{_, _, _, n, n, o, o, p, p, n, n, n, n, n, n, _, _},
+{_, _, n, n, n, m, o, o, o, o, o, o, m, m, m, m, _},
+{_, n, b, b, b, b, b, b, m, m, m, m, m, w, m, w, m},
+{_, n, b, w, w, w, w, k, k, w, w, k, w, m, w, w, m},
+{_, n, b, m, m, m, b, b, i, i, b, b, i, m, w, w, m},
+{_, n, m, w, w, m, m, k, k, i, i, k, k, i, m, m, _},
+{_, m, w, w, w, w, w, m, i, w, w, i, i, w, k, _, _},
+{_, m, w, w, w, w, w, m, i, w, w, i, i, k, m, m, _},
+{_, _, m, w, w, w, m, i, i, i, i, i, k, m, a, m, n},
+{_, n, m, m, m, m, i, i, i, i, i, k, m, m, m, n, n},
+{n, m, m, m, k, k, i, i, i, i, i, k, m, m, m, n, n},
+{n, m, m, m, k, k, k, k, k, k, k, k, m, m, n, n, n},
+{n, m, m, a, m, m, k, k, _, _, _, _, m, n, n, n, _},
+{_, n, m, m, n, n, _, _, _, _, _, _, n, n, n, _, _},
+{_, _, n, n, _, _, _, _, _, _, _, _, _, n, _, _, _},
+
+   
+};
 const vector<vector<int>> Mario::mario_sprite_dead_ = {
    {_, _, _, _, _, _, k, k, k, k, _, _, _, _, _, _},
    {_, _, _, _, k, k, b, a, a, b, k, k, _, _, _, _},
@@ -75,14 +111,6 @@ const vector<vector<int>> Mario::mario_sprite_dead_ = {
     {_, _, _, _, _, _, _, _, _, _, n, n, _, _, _, _},
    
 };
-const vector<vector<int>> Mario::mario_sprite_backward_ = {
-    
-};
-
-const int i = 0x00BFFF;
-const int f = 0x2f2c79;
-const int u = 0x1a66cc;
-const int c = 0x9eecff;
 const vector<vector<int>> Iceball::iceball_sprite_ = {
     {_, _, _, _, _, _, f, _, _, f},
     {_, _, _, _, _, _, f, f, _, f, f},
@@ -99,10 +127,13 @@ const vector<vector<int>> Iceball::iceball_sprite_ = {
     
 
 
-void Mario::paint(pro2::Window& window, bool dead_sprite) const {
+void Mario::paint(pro2::Window& window, bool dead_sprite, bool flor_recogida) const {
     const Pt top_left = {pos_.x - 8, pos_.y - 26};
     if(dead_sprite){
         paint_sprite(window, top_left, mario_sprite_dead_, looking_left_);
+    }
+    else if(flor_recogida){
+        paint_sprite(window, top_left, mario_sprite_hielo_, looking_left_);
     }
     else{
         paint_sprite(window, top_left, mario_sprite_normal_, looking_left_);

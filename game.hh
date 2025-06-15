@@ -22,7 +22,7 @@ class Game {
     Planta                carnivora_;
     Bloc bloc_{pro2::Pt{300, 84}};
     Bloc bloc_flor_{pro2::Pt{0, 0}};
-    Door puerta_{pro2::Pt{1125, 150}};
+    Door puerta_{pro2::Pt{1125, 149}};
     Bowser bowser_{pro2::Pt{1300, 150-39}};
     Peach peach_{pro2::Pt{1350, 150-32}};
 
@@ -60,6 +60,7 @@ class Game {
     std::vector<Decor> decoracions_;
     std::vector<Platform> plataformas_nuevo_mapa_;
     std::vector<Iceball> iceballs_;
+    std::vector<pro2::Pt> estrellas_;
     Finder<Platform> platforms_finder_;     //finder per les plataformes
     Finder<Moneda> monedas_finder_;     //finder per les plataformes i les monedes
     Finder<Goomba> goombas_finder_;     //finder per els goombas
@@ -79,6 +80,7 @@ class Game {
 
     void update(pro2::Window& window);
     void paint(pro2::Window& window);
+    void paint_stars_background(pro2::Window& window) const;
 
     bool is_finished() const {
         return finished_;
@@ -86,6 +88,7 @@ class Game {
 
  private:
     static constexpr int sky_blue = 0x5c94fc;
+    
 };
 
 #endif

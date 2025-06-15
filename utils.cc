@@ -38,5 +38,4 @@ void paint_rect(pro2::Window& window, int x0, int y0, int x1, int y1, pro2::Colo
     }
 }
 
-
 }  // namespace pro2

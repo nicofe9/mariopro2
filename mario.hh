@@ -46,7 +46,7 @@ class Mario {
  public:
     Mario(pro2::Pt pos) : pos_(pos), last_pos_(pos) {}
 
-    void paint(pro2::Window& window, bool dead_sprite = false) const;
+    void paint(pro2::Window& window, bool dead_sprite = false, bool flor_recogida = false) const;
 
     pro2::Pt pos() const {
         return pos_;
@@ -91,7 +91,7 @@ class Mario {
  private:
     static const std::vector<std::vector<int>> mario_sprite_normal_;
     static const std::vector<std::vector<int>> mario_sprite_dead_;
-    static const std::vector<std::vector<int>> mario_sprite_backward_;
+    static const std::vector<std::vector<int>> mario_sprite_hielo_;
 };
 
 #endif
